@@ -13,26 +13,35 @@
   <title>KidsWeekly — סידור שבועי לילדים</title>
   <style>
     :root{
-      --app-font:Arial,"Segoe UI",sans-serif;
+      --app-font:"Segoe UI",Arial,sans-serif;
       --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#73809a;--line:#e7ebf2;
       --primary:#3157d5;--primary-dark:#2445b7;--primary-soft:#e9efff;
       --green:#24a865;--green-soft:#e9f8f0;--red:#dc5555;--red-soft:#fff0f0;
       --shadow:0 14px 38px rgba(33,50,92,.10);--radius:24px;
     }
-    *,*::before,*::after{box-sizing:border-box;font-family:var(--app-font)}
-    html{background:var(--bg);font-family:var(--app-font)}
+    html,body,body *{font-family:var(--app-font)!important}
+    *,*::before,*::after{box-sizing:border-box;font-family:var(--app-font)!important;font-style:normal;font-variant:normal}
+    html{background:var(--bg)}
     body{margin:0;min-height:100vh;background:
       radial-gradient(circle at 100% 0,#e8eeff 0,transparent 34%),
       radial-gradient(circle at 0 30%,#eef8ff 0,transparent 27%),var(--bg);
-      color:var(--text);font-family:var(--app-font)}
-    button,input,select,textarea,option,optgroup{font-family:var(--app-font)!important;font-size:inherit}
-    input::placeholder,textarea::placeholder{font-family:var(--app-font)!important}
-    input[type="date"]::-webkit-datetime-edit,
+      color:var(--text);font-family:var(--app-font)!important}
+    button,input,select,textarea,option,optgroup{
+      font-family:var(--app-font)!important;
+      font-size:inherit;
+      font-style:normal;
+      font-variant:normal;
+      letter-spacing:normal;
+    }
+    input::placeholder,textarea::placeholder{font-family:var(--app-font)!important;font-style:normal}
+    input[type="date"],input[type="date"]::-webkit-datetime-edit,
     input[type="date"]::-webkit-datetime-edit-fields-wrapper,
     input[type="date"]::-webkit-datetime-edit-text,
     input[type="date"]::-webkit-datetime-edit-month-field,
     input[type="date"]::-webkit-datetime-edit-day-field,
-    input[type="date"]::-webkit-datetime-edit-year-field{font-family:var(--app-font)!important}
+    input[type="date"]::-webkit-datetime-edit-year-field,
+    input[type="date"]::-webkit-calendar-picker-indicator{font-family:var(--app-font)!important}
+    select option,select optgroup{font-family:var(--app-font)!important}
     button{cursor:pointer}
     .app{max-width:920px;margin:auto;padding:18px 16px 44px}
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:2px 0 18px}
