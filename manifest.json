@@ -1,0 +1,20 @@
+{
+  "name": "סידור שבועי לילדים",
+  "short_name": "KidsWeekly",
+  "description": "יצירת סידור שבועי לילדים ושיתוף ל-WhatsApp",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
