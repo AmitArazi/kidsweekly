@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="KidsWeekly">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>סידור שבועי לילדים</title>
+  <style>
+    :root{--bg:#f1f5f9;--card:#fff;--text:#0f172a;--muted:#64748b;--blue:#2563eb;--green:#16a34a;--red:#dc2626;--border:#dbe3ee}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;min-height:100vh}.wrap{max-width:820px;margin:auto;padding:18px}.hero{padding:24px;border-radius:22px;background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;box-shadow:0 14px 35px #0f172a2e}.hero h1{margin:0 0 8px;font-size:clamp(27px,6vw,40px)}.hero p{margin:0;color:#dbeafe}.card{background:var(--card);border-radius:18px;padding:16px;margin-top:16px;box-shadow:0 8px 24px #0f172a12}.toolbar{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px;font-weight:700}input,select,textarea,button{width:100%;font:inherit;border-radius:12px}input,select,textarea{border:1px solid var(--border);background:#fff;color:var(--text);padding:11px 12px}button{border:0;padding:12px 14px;font-weight:700;cursor:pointer}.secondary{background:#e2e8f0}.primary{background:var(--blue);color:#fff}.success{background:var(--green);color:#fff}.danger{background:#fee2e2;color:#991b1b}.week-title{font-size:20px;font-weight:700;margin-bottom:14px}.days{display:grid;gap:12px}.day{display:grid;grid-template-columns:120px 1fr 1fr;gap:12px;align-items:end;padding:14px;border:1px solid var(--border);border-radius:16px;background:#fbfdff}.day-name{font-size:18px;font-weight:700;padding-bottom:10px}.date{display:block;color:var(--muted);font-size:12px;margin-top:4px}.custom{display:none;margin-top:7px}.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.status{min-height:22px;margin-top:8px;color:var(--green);font-size:14px}textarea{min-height:330px;line-height:1.7;resize:vertical}.small{color:var(--muted);font-size:12px}@media(max-width:650px){.toolbar{grid-template-columns:1fr}.day{grid-template-columns:1fr 1fr}.day-name{grid-column:1/-1;padding-bottom:0}.actions{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero"><h1>סידור שבועי לילדים</h1><p>בוחרים מי לוקח ומי מחזיר ומקבלים הודעת WhatsApp מוכנה.</p></section>
+    <section class="card toolbar"><div><label for="weekStart">יום ראשון של השבוע</label><input id="weekStart" type="date"></div><button class="secondary" id="currentWeek">עבור לשבוע הקרוב</button></section>
+    <section class="card"><div class="week-title" id="weekTitle"></div><div class="days" id="days"></div></section>
+    <section class="card"><div class="actions"><button class="primary" id="generate">צור הודעה</button><button class="success" id="copy">העתק</button><button class="success" id="share">שתף</button><button class="danger" id="reset">איפוס</button></div><div class="status" id="status"></div></section>
+    <section class="card"><h2 style="margin-top:0">תצוגה מקדימה</h2><div class="small">המידע נשמר אוטומטית במכשיר</div><textarea id="preview" aria-label="תצוגת הודעת WhatsApp"></textarea></section>
+  </main>
+  <script>
+    const PEOPLE=["עמית","סתיו","מרגלית","שושי","אחר"],DAYS=["ראשון","שני","שלישי","רביעי","חמישי"],DEFAULT=[["עמית","עמית"],["סתיו","עמית"],["סתיו","סתיו"],["עמית","מרגלית"],["עמית","שושי"]];
+    const $=s=>document.querySelector(s),weekStart=$("#weekStart"),daysEl=$("#days"),preview=$("#preview"),statusEl=$("#status"),weekTitle=$("#weekTitle");
+    const pad=n=>String(n).padStart(2,"0"),fmt=d=>`${pad(d.getDate())}/${pad(d.getMonth()+1)}`,iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    function parseDate(v){const[y,m,d]=v.split("-").map(Number);return new Date(y,m-1,d)}
+    function upcomingSunday(){const d=new Date(),n=new Date(d.getFullYear(),d.getMonth(),d.getDate());n.setDate(n.getDate()+(7-n.getDay())%7);return n}
+    function key(){return `kidsweekly:${weekStart.value}`}
+    function female(name){return ["סתיו","מרגלית","שושי"].includes(name)}
+    function saved(){try{return JSON.parse(localStorage.getItem(key()))}catch{return null}}
+    function selector(id,value){return `<select id="${id}">${PEOPLE.map(p=>`<option ${p===value?"selected":""}>${p}</option>`).join("")}</select>`}
+    function render(){const start=parseDate(weekStart.value),data=saved(),plan=data?.plan||DEFAULT,custom=data?.custom||{};daysEl.innerHTML="";DAYS.forEach((day,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);const row=document.createElement("div");row.className="day";row.innerHTML=`<div class="day-name">${day}<span class="date">${fmt(d)}</span></div><div><label>לוקח/ת</label>${selector(`take-${i}`,plan[i][0])}<input class="custom" id="take-custom-${i}" placeholder="שם אחר" value="${custom[`take-${i}`]||""}"></div><div><label>מחזיר/ה</label>${selector(`return-${i}`,plan[i][1])}<input class="custom" id="return-custom-${i}" placeholder="שם אחר" value="${custom[`return-${i}`]||""}"></div>`;daysEl.appendChild(row)});bind();updateTitle();generate(false)}
+    function bind(){DAYS.forEach((_,i)=>["take","return"].forEach(type=>{const s=$(`#${type}-${i}`),c=$(`#${type}-custom-${i}`);c.style.display=s.value==="אחר"?"block":"none";s.addEventListener("change",()=>{c.style.display=s.value==="אחר"?"block":"none";save();generate(false)});c.addEventListener("input",()=>{save();generate(false)})}))}
+    function name(type,i){const s=$(`#${type}-${i}`);return s.value==="אחר"?($(`#${type}-custom-${i}`).value.trim()||"אחר"):s.value}
+    function save(){const plan=[],custom={};DAYS.forEach((_,i)=>{plan.push([$(`#take-${i}`).value,$(`#return-${i}`).value]);custom[`take-${i}`]=$(`#take-custom-${i}`).value;custom[`return-${i}`]=$(`#return-custom-${i}`).value});localStorage.setItem(key(),JSON.stringify({plan,custom}))}
+    function updateTitle(){const s=parseDate(weekStart.value),e=new Date(s);e.setDate(s.getDate()+4);weekTitle.textContent=`השבוע: ${fmt(s)}–${fmt(e)}`}
+    function line(person,action){const icon=female(person)?"👩":"👨",verb=action==="take"?(female(person)?"לוקחת":"לוקח"):(female(person)?"מחזירה":"מחזיר");return `${icon} ${person} – ${verb}`}
+    function generate(show=true){const s=parseDate(weekStart.value),e=new Date(s);e.setDate(s.getDate()+4);let msg=`📅 *סידור שבועי לילדים | ${fmt(s)}–${fmt(e)}*\n`;DAYS.forEach((day,i)=>{const take=name("take",i),ret=name("return",i);msg+=`\n*${day}*\n`;if(take===ret){msg+=`${female(take)?"👩":"👨"} ${take} – ${female(take)?"לוקחת ומחזירה":"לוקח ומחזיר"}\n`}else{msg+=`${line(take,"take")}\n${line(ret,"return")}\n`}});preview.value=msg.trim();save();if(show)setStatus("ההודעה נוצרה")}
+    function setStatus(text){statusEl.textContent=text;clearTimeout(window.statusTimer);window.statusTimer=setTimeout(()=>statusEl.textContent="",2200)}
+    async function copy(){generate(false);try{await navigator.clipboard.writeText(preview.value)}catch{preview.select();document.execCommand("copy")}setStatus("הועתק ללוח")}
+    async function share(){generate(false);if(navigator.share){try{await navigator.share({title:"סידור שבועי לילדים",text:preview.value})}catch{}}else{window.open(`https://wa.me/?text=${encodeURIComponent(preview.value)}`,"_blank")}}
+    weekStart.addEventListener("change",render);$("#currentWeek").addEventListener("click",()=>{weekStart.value=iso(upcomingSunday());render()});$("#generate").addEventListener("click",()=>generate(true));$("#copy").addEventListener("click",copy);$("#share").addEventListener("click",share);$("#reset").addEventListener("click",()=>{localStorage.removeItem(key());render();setStatus("השבוע אופס")});
+    weekStart.value=iso(upcomingSunday());render();
+    if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(console.error));
+  </script>
+</body>
+</html>
